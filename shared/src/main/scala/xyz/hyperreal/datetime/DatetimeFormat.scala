@@ -10,7 +10,7 @@ import scala.collection.immutable.ArraySeq
 object DatetimeFormat {
 
   val ISO: DatetimeFormat = DatetimeFormat.parse("YYYY-MM-DDThh:mm:ss.fffZ")
-  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat.parse("WWWW, MMMM D, YYYY")
+  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat.parse("WWWW, MMMM D, YYYY |at| h12:mm a")
 
   private abstract class Element
   private case class StringElement(s: String) extends Element
@@ -61,7 +61,7 @@ object DatetimeFormat {
       @tailrec
       def string(r: CharReader, idx: Int): Boolean =
         if (idx == s.length) true
-        else if (r.ch == s(idx)) string(r, idx + 1)
+        else if (r.ch == s(idx)) string(r.next, idx + 1)
         else false
 
       string(r, 0)
@@ -119,7 +119,7 @@ object DatetimeFormat {
               case ('m', 1 | 2)           => MinuteElement(count)
               case ('s', 1 | 2)           => SecondElement(count)
               case ('f', _) if count <= 9 => FractionalElement(count)
-              case _                      => r.error("unrecognized date/time format element")
+              case _                      => r.error(s"unrecognized date/time format element: '${r.ch.toString * count}'")
             })
           element(rest)
         case _ =>
@@ -145,8 +145,8 @@ class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
 
   def format(d: Datetime): String =
     (elems map {
-      case AmPmElement               => if (d.hours < 12) "AM" else "PM"
-      case StringElement(c)          => c.toString
+      case AmPmElement               => if (d.hours < 12) "a.m." else "p.m."
+      case StringElement(s)          => s
       case DayElement(v)             => variants(v, d.day)
       case HourElement(v)            => variants(v, d.hours)
       case YearElement(2)            => (d.year % 100).toString
@@ -159,9 +159,15 @@ class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
       case SecondElement(v)          => variants(v, d.seconds)
       case WeekdayElement(3)         => weekdayShort(d.dayOfWeek)
       case WeekdayElement(4)         => weekdayLong(d.dayOfWeek)
-      case FractionalElement(1)      => (d.millis % 100).toString
-      case FractionalElement(2)      => f"${d.millis % 10}%02d"
+      case FractionalElement(1)      => (d.millis / 100).toString
+      case FractionalElement(2)      => f"${d.millis / 10}%02d"
       case FractionalElement(3)      => f"${d.millis}%03d"
+      case FractionalElement(4)      => f"${d.millis}%03d${d.nanos / 100000}%d"
+      case FractionalElement(5)      => f"${d.millis}%03d${d.nanos / 10000}%02d"
+      case FractionalElement(6)      => f"${d.millis}%03d${d.nanos / 1000}%03d"
+      case FractionalElement(7)      => f"${d.millis}%03d${d.nanos / 100}%04d"
+      case FractionalElement(8)      => f"${d.millis}%03d${d.nanos / 10}%05d"
+      case FractionalElement(9)      => f"${d.millis}%03d${d.nanos}%06d"
     }).mkString
 
 }

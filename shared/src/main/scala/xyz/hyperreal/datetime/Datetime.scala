@@ -67,4 +67,6 @@ case class Datetime(era: Int,
 
   def toISOString: String = DatetimeFormat.ISO.format(this)
 
+  override def toString: String = DatetimeFormat.DISPLAY_DATE.format(this)
+
 }
