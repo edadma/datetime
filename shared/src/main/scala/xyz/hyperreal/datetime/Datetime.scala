@@ -65,6 +65,6 @@ case class Datetime(era: Int,
     0
   }
 
-  def toISOString: String = f"$year%04d-$month%02d-$day%02dT$hours%02d:$minutes%02d:$seconds%02d.$millis%03d"
+  def toISOString: String = DatetimeFormat.ISO.format(this)
 
 }
