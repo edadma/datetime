@@ -10,9 +10,10 @@ import scala.collection.immutable.ArraySeq
 object DatetimeFormat {
 
   val ISO: DatetimeFormat = DatetimeFormat.parse("YYYY-MM-DDThh:mm:ss.fffZ")
+  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat.parse("WWWW, MMMM D, YYYY")
 
   private abstract class Element
-  private case class CharElement(c: Char) extends Element
+  private case class StringElement(s: String) extends Element
   private case class YearElement(variant: Int) extends Element
   private case class MonthElement(variant: Int) extends Element
   private case class DayElement(variant: Int) extends Element
@@ -71,15 +72,38 @@ object DatetimeFormat {
       if (r.eoi || count <= 0) r
       else skip(r.next, count - 1)
 
+    def literal(delim: Char, r: CharReader): Option[(String, CharReader)] = {
+      val buf = new StringBuilder
+
+      @tailrec
+      def literal(r: CharReader): Option[(String, CharReader)] =
+        r.ch match {
+          case `delim`        => Some((buf.toString, r.next))
+          case CharReader.EOI => None
+          case c =>
+            buf += c
+            literal(r.next)
+        }
+
+      literal(r)
+    }
+
     @tailrec
     def element(r: CharReader): Unit =
       r.ch match {
         case CharReader.EOI =>
+        case '|' =>
+          literal('|', r.next) match {
+            case None => r.error("unclosed literal")
+            case Some((s, rest)) =>
+              buf += StringElement(s)
+              element(rest)
+          }
         case 'h' if string(r, "h12") =>
-          Hour12Element(1)
+          buf += Hour12Element(1)
           element(skip(r, 3))
         case 'h' if string(r, "hh12") =>
-          Hour12Element(2)
+          buf += Hour12Element(2)
           element(skip(r, 4))
         case 'Y' | 'M' | 'D' | 'W' | 'h' | 'a' | 'm' | 's' | 'f' =>
           val (count, rest) = rep(r.ch, r)
@@ -99,7 +123,7 @@ object DatetimeFormat {
             })
           element(rest)
         case _ =>
-          buf += CharElement(r.ch)
+          buf += StringElement(r.ch.toString)
           element(r.next)
       }
 
@@ -122,7 +146,7 @@ class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
   def format(d: Datetime): String =
     (elems map {
       case AmPmElement               => if (d.hours < 12) "AM" else "PM"
-      case CharElement(c)            => c.toString
+      case StringElement(c)          => c.toString
       case DayElement(v)             => variants(v, d.day)
       case HourElement(v)            => variants(v, d.hours)
       case YearElement(2)            => (d.year % 100).toString
