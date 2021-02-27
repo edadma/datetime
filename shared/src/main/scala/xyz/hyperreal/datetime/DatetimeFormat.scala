@@ -9,8 +9,8 @@ import scala.collection.immutable.ArraySeq
 
 object DatetimeFormat {
 
-  val ISO: DatetimeFormat = DatetimeFormat.parse("YYYY-MM-DDThh:mm:ss.fffZ")
-  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat.parse("WWWW, MMMM D, YYYY |at| h12:mm a")
+  val ISO: DatetimeFormat = DatetimeFormat("YYYY-MM-DDThh:mm:ss.fffZ")
+  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat("WWWW, MMMM D, YYYY |at| h12:mm a")
 
   private abstract class Element
   private case class StringElement(s: String) extends Element
@@ -42,7 +42,7 @@ object DatetimeFormat {
   private val weekdayShort = ArraySeq("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
   private val weekdayLong = ArraySeq("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
 
-  def parse(s: String): DatetimeFormat = {
+  def apply(s: String): DatetimeFormat = {
     val buf = new ListBuffer[Element]
     val r = CharReader.fromString(s)
 
