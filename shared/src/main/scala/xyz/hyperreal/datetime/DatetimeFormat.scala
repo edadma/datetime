@@ -110,7 +110,7 @@ object DatetimeFormat {
 
           buf +=
             ((r.ch, count) match {
-              case ('Y', 4 | 2)           => YearElement(count)
+              case ('Y', 4 | 2 | 1)       => YearElement(count)
               case ('M', 1 | 2 | 3 | 4)   => MonthElement(count)
               case ('D', 1 | 2)           => DayElement(count)
               case ('W', 3 | 4)           => WeekdayElement(count)
@@ -149,8 +149,9 @@ class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
       case StringElement(s)          => s
       case DayElement(v)             => variants(v, d.day)
       case HourElement(v)            => variants(v, d.hours)
+      case YearElement(4)            => f"${d.year}%04d"
       case YearElement(2)            => (d.year % 100).toString
-      case YearElement(4)            => d.year.toString
+      case YearElement(1)            => d.year.toString
       case MonthElement(v @ (1 | 2)) => variants(v, d.month)
       case MonthElement(3)           => monthsShort(d.month - 1)
       case MonthElement(4)           => monthsLong(d.month - 1)
