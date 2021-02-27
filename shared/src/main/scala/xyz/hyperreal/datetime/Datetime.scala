@@ -5,18 +5,36 @@ import scala.collection.immutable.ArraySeq
 
 object Datetime {
 
-//  def now(tz: Timezone): Datetime = forInstant(xyz.hyperreal.datetime.Platform.currentTimeMillis, tz)
+  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(platform.currentTimeMillis, tz)
 
-  def fromDays(days: Int): Datetime = {
+  private def civilFromDays(days: Int): (Int, Int, Int) = {
     val z = days + 719468
     val era = (if (z >= 0) z else z - 146096) / 146097
-    Datetime(y, m, d, 0, 0, 0, 0)
+    val doe = z - era * 146097
+    val yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+    val y = yoe + era * 400
+    val doy = doe - (365 * yoe + yoe / 4 - yoe / 100)
+    val mp = (5 * doy + 2) / 153
+    val d = doy - (153 * mp + 2) / 5 + 1
+    val m = mp + (if (mp < 10) 3 else -9)
+
+    (y + (if (m <= 2) 1 else 0), m, d)
   }
 
-  def fromMillis(millis: Long, tz: Timezone): Datetime = {
-    val t = millis + tz.offset(millis)
+  def fromDays(days: Int): Datetime = {
+    val (y, m, d) = civilFromDays(days)
 
-    Datetime(y, m, d, 0, 0, 0, 0)
+    Datetime(y, m, d, 0, 0, 0)
+  }
+
+  def fromMillis(millis: Long, tz: Timezone = Timezone.UTC): Datetime = {
+    val t = millis + tz.offset(millis)
+    val (y, m, d) = civilFromDays(floorDiv(t, 24 * 60 * 60 * 1000).toInt)
+    val day = floorMod(t, 24 * 60 * 60 * 1000).toInt
+    val hour = day % (60 * 60 * 1000)
+    val minute = hour % (60 * 1000)
+
+    Datetime(y, m, d, day / 60 / 60 / 1000, hour / 60 / 1000, minute / 1000, day % 1000 * 1000000)
   }
 
   def from(s: String): Datetime = {
@@ -102,6 +120,8 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
 
     0
   }
+
+  def withoutTime: Datetime = Datetime(year, month, day, 0, 0, 0)
 
   lazy val lengthOfYear: Int = if (isLeapYear) 366 else 365
 
