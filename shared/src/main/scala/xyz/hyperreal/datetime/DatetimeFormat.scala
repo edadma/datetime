@@ -159,15 +159,15 @@ class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
       case SecondElement(v)          => variants(v, d.seconds)
       case WeekdayElement(3)         => weekdayShort(d.dayOfWeek)
       case WeekdayElement(4)         => weekdayLong(d.dayOfWeek)
-      case FractionalElement(1)      => (d.millis / 100).toString
-      case FractionalElement(2)      => f"${d.millis / 10}%02d"
-      case FractionalElement(3)      => f"${d.millis}%03d"
-      case FractionalElement(4)      => f"${d.millis}%03d${d.nanos / 100000}%d"
-      case FractionalElement(5)      => f"${d.millis}%03d${d.nanos / 10000}%02d"
-      case FractionalElement(6)      => f"${d.millis}%03d${d.nanos / 1000}%03d"
-      case FractionalElement(7)      => f"${d.millis}%03d${d.nanos / 100}%04d"
-      case FractionalElement(8)      => f"${d.millis}%03d${d.nanos / 10}%05d"
-      case FractionalElement(9)      => f"${d.millis}%03d${d.nanos}%06d"
+      case FractionalElement(1)      => (d.nanos / 100000000).toString
+      case FractionalElement(2)      => f"${d.nanos / 10000000}%02d"
+      case FractionalElement(3)      => f"${d.nanos / 1000000}%03d"
+      case FractionalElement(4)      => f"${d.nanos / 100000}%04d"
+      case FractionalElement(5)      => f"${d.nanos / 10000}%05d"
+      case FractionalElement(6)      => f"${d.nanos / 1000}%06d"
+      case FractionalElement(7)      => f"${d.nanos / 100}%07d"
+      case FractionalElement(8)      => f"${d.nanos / 10}%08d"
+      case FractionalElement(9)      => f"${d.nanos}%09d"
     }).mkString
 
 }

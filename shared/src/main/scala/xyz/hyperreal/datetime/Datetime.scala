@@ -10,30 +10,19 @@ object Datetime {
   def forInstant(millis: Long, tz: Timezone): Datetime = {
     val t = millis + tz.offset(millis)
 
-    Datetime(1, 1, 1, 1, 1, 1, 1, 1)
+    Datetime(1, 1, 1, 1, 1, 1, 1)
   }
 
 }
 
-case class Datetime(era: Int,
-                    year: Int,
-                    month: Int,
-                    day: Int,
-                    hours: Int,
-                    minutes: Int,
-                    seconds: Int,
-                    millis: Int = 0,
-                    nanos: Int = 0)
+case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, seconds: Int, nanos: Int = 0)
     extends Ordered[Datetime] {
 
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
-  check("era", era, 0, 1)
   check("year", year, 1, 5000)
 
-  private val yr = if (era > 0) year else -year + 1
-
-  val leap: Boolean = yr % 4 == 0 && yr % 100 > 0 || yr % 400 == 0
+  val leap: Boolean = year % 4 == 0 && year % 100 > 0 || year % 400 == 0
 
   check("month", month, 1, 12)
 
@@ -43,8 +32,7 @@ case class Datetime(era: Int,
   check("hours", hours, 0, 23)
   check("minutes", minutes, 0, 59)
   check("seconds", seconds, 0, 59)
-  check("millis", millis, 0, 999)
-  check("nanos", millis, 0, 999999)
+  check("nanos", nanos, 0, 999999999)
 
   private val m = if (month <= 2) month + 10 else month - 2
   private val c = year % 100
