@@ -7,10 +7,16 @@ object Datetime {
 
 //  def now(tz: Timezone): Datetime = forInstant(xyz.hyperreal.datetime.Platform.currentTimeMillis, tz)
 
-  def forInstant(millis: Long, tz: Timezone): Datetime = {
+  def fromDays(days: Int): Datetime = {
+    val z = days + 719468
+    val era = (if (z >= 0) z else z - 146096) / 146097
+    Datetime(y, m, d, 0, 0, 0, 0)
+  }
+
+  def fromMillis(millis: Long, tz: Timezone): Datetime = {
     val t = millis + tz.offset(millis)
 
-    Datetime(1, 1, 1, 1, 1, 1, 1)
+    Datetime(y, m, d, 0, 0, 0, 0)
   }
 
   def from(s: String): Datetime = {
@@ -70,27 +76,19 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
 
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
-  check("year", year, -5000, 5000)
+  check("year", year, -10000, 10000)
 
   val isLeapYear: Boolean = floorMod(year, 4) == 0 && floorMod(year, 100) > 0 || floorMod(year, 400) == 0
 
   check("month", month, 1, 12)
 
-  val lastDayOfMonth: Int = if (month == 2 && isLeapYear) 29 else months(month - 1)
+  val lengthOfMonth: Int = if (month == 2 && isLeapYear) 29 else months(month - 1)
 
-  check("day", day, 1, lastDayOfMonth)
+  check("day", day, 1, lengthOfMonth)
   check("hours", hours, 0, 23)
   check("minutes", minutes, 0, 59)
   check("seconds", seconds, 0, 59)
   check("nanos", nanos, 0, 999999999)
-
-  // https://cs.uwaterloo.ca/~alopez-o/math-faq/node73.html
-//  lazy val dayOfWeek: Int = {
-//    val m = if (month <= 2) month + 10 else month - 2
-//    val c = floorMod(year, 100)
-//
-//    (day + floor(2.6 * m - 0.2) - 2 * c + year + floor(year / 4.0) + floor(c / 4.0)).toInt % 7
-//  }
 
   private def check(name: String, v: Int, l: Int, h: Int): Unit =
     require(l <= v && v <= h, s"$name is out of range: $v")
@@ -104,6 +102,8 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
 
     0
   }
+
+  lazy val lengthOfYear: Int = if (isLeapYear) 366 else 365
 
   lazy val days: Int = {
     val y = if (month <= 2) year - 1 else year
