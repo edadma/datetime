@@ -16,20 +16,30 @@ object Datetime {
   def from(s: String): Datetime = {
     var idx = 0
 
+    def error = sys.error(s"error parsing date-time at character ${idx + 1}")
+
     def digits(n: Int, cs: Char*): Int = {
-      if ((0 until n).forall(s(_).isDigit)) {
-        idx += n
-        char(cs: _*)
-        (0 until n).map(s).mkString.toInt
+      var count = 0
+
+      while (count < n && idx + count < s.length && s(idx + count).isDigit) count += 1
+
+      if (count > 0 && (cs.isEmpty || (cs contains s(idx + count)))) {
+        val res = (idx until idx + count).map(s).mkString.toInt
+
+        if (cs.nonEmpty)
+          idx += 1
+
+        idx += count
+        res
       } else
-        sys.error("error parsing date-time")
+        error
     }
 
-    def char(cs: Char*): Unit =
-      if (cs contains s(idx))
-        idx += cs.length
-      else
-        sys.error("error parsing date-time")
+    def opt(c: Char) =
+      if (idx < s.length && s(idx) == c) {
+        idx += 1
+        true
+      } else false
 
     val y = digits(4, '-')
     val m = digits(2, '-')
@@ -37,10 +47,22 @@ object Datetime {
     val h = digits(2, ':')
     val min = digits(2, ':')
     val sec = digits(2)
+    val n =
+      if (opt('.')) {
+        val start = idx
+        val x = digits(9)
 
-    Datetime(y, m, d, h, min, sec, 0)
+        (x * math.pow(10, 9 - idx + start)).toInt
+      } else 0
 
+    opt('Z')
+
+    if (idx == s.length)
+      Datetime(y, m, d, h, min, sec, n)
+    else
+      error
   }
+
 }
 
 case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, seconds: Int, nanos: Int = 0)
