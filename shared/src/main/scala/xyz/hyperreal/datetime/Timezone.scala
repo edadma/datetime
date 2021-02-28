@@ -6,35 +6,9 @@ object Timezone {
 
   import Datetime._
 
-  val UTC: Timezone = new Timezone {
-    def offset(year: Int, month: Int, day: Int, millis: Int): Int = 0
-
-    def offset(millis: Long): Int = 0
-
-    def getID: String = "UTC"
-
-    def getDisplayName: String = "Coordinated Universal Time"
-  }
-
-  val ET: Timezone = new Timezone {
-    def offset(year: Int, month: Int, day: Int, millis: Int): Int = -5 * HOUR
-
-    def offset(millis: Long): Int = -5 * HOUR
-
-    def getID: String = "ET"
-
-    def getDisplayName: String = "Eastern Time"
-  }
-
-  val CT: Timezone = new Timezone {
-    def offset(year: Int, month: Int, day: Int, millis: Int): Int = -6 * HOUR
-
-    def offset(millis: Long): Int = -6 * HOUR
-
-    def getID: String = "CT"
-
-    def getDisplayName: String = "Central Time"
-  }
+  val UTC: Timezone = new SimpleTimezone(0, "UTC", "Coordinated Universal Time")
+  val ET: Timezone = new SimpleTimezone(-5 * HOUR, "ET", "Eastern Time")
+  val CT: Timezone = new SimpleTimezone(-6 * HOUR, "CT", "Central Time")
 
   private val tz = mutable.HashMap[String, Timezone]("UTC" -> UTC, "EST" -> ET, "CST" -> CT)
 
@@ -48,8 +22,14 @@ trait Timezone {
 
   def offset(millis: Long): Int
 
-  def getID: String
+  def id: String
 
-  def getDisplayName: String
+  def displayName: String
 
+}
+
+class SimpleTimezone(offset: Int, val id: String, val displayName: String) extends Timezone {
+  def offset(year: Int, month: Int, day: Int, millis: Int): Int = offset
+
+  def offset(millis: Long): Int = offset
 }
