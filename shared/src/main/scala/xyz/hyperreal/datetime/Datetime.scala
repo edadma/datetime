@@ -6,12 +6,16 @@ import scala.collection.immutable.ArraySeq
 
 object Datetime {
 
+  private[datetime] val MINUTE = 60 * 1000
+  private[datetime] val HOUR = 60 * MINUTE
+  private[datetime] val DAY: Long = 24 * HOUR
+
   def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(platform.currentTimeMillis, tz)
 
   def today(tz: Timezone = Timezone.UTC): Datetime = {
     val ms = platform.currentTimeMillis
 
-    fromDays(((ms + tz.offset(ms)) / 24 / 60 / 60 / 1000).toInt)
+    fromDays(((ms + tz.offset(ms)) / DAY).toInt)
   }
 
   private def civilFromDays(days: Int): (Int, Int, Int) = {
@@ -31,17 +35,17 @@ object Datetime {
   def fromDays(days: Int): Datetime = {
     val (y, m, d) = civilFromDays(days)
 
-    Datetime(y, m, d, 0, 0, 0)
+    Datetime(y, m, d)
   }
 
   def fromMillis(millis: Long, tz: Timezone = Timezone.UTC): Datetime = {
     val t = millis + tz.offset(millis)
-    val (y, m, d) = civilFromDays(floorDiv(t, 24 * 60 * 60 * 1000).toInt)
-    val day = floorMod(t, 24 * 60 * 60 * 1000).toInt
-    val hour = day % (60 * 60 * 1000)
-    val minute = hour % (60 * 1000)
+    val (y, m, d) = civilFromDays(floorDiv(t, DAY).toInt)
+    val day = floorMod(t, DAY).toInt
+    val hour = day % HOUR
+    val minute = hour % MINUTE
 
-    Datetime(y, m, d, day / 60 / 60 / 1000, hour / 60 / 1000, minute / 1000, day % 1000 * 1000000)
+    Datetime(y, m, d, day / HOUR, hour / MINUTE, minute / 1000, day % 1000 * 1000000)
   }
 
   def from(s: String): Datetime = {
@@ -96,8 +100,10 @@ object Datetime {
 
 }
 
-case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, seconds: Int, nanos: Int = 0)
+case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: Int = 0, seconds: Int = 0, nanos: Int = 0)
     extends Ordered[Datetime] {
+
+  import Datetime._
 
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
@@ -128,7 +134,9 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
     0
   }
 
-  def withoutTime: Datetime = Datetime(year, month, day, 0, 0, 0)
+  def startOfDay: Datetime = Datetime(year, month, day)
+
+  def startOfMonth: Datetime = Datetime(year, month, 1)
 
   lazy val lengthOfYear: Int = if (isLeapYear) 366 else 365
 
@@ -143,7 +151,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
   }
 
   lazy val millis: Long =
-    days.toLong * 24 * 60 * 60 * 1000 + hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000 + nanos / 1000000
+    days.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000 + nanos / 1000000
 
   lazy val dayOfWeek: Int = {
     val z = days
@@ -152,6 +160,12 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
   }
 
   def sameDateAs(that: Datetime): Boolean = year == that.year && month == that.month && day == that.day
+
+  def plusDays(days: Int): Datetime = fromMillis(millis + days * DAY)
+
+  def minusDays(days: Int): Datetime = fromMillis(millis - days * DAY)
+
+  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(millis - from.offset(millis), to)
 
   def toISOString: String = DatetimeFormat.ISO.format(this)
 

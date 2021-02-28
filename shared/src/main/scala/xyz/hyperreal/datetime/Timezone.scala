@@ -4,6 +4,8 @@ import scala.collection.mutable
 
 object Timezone {
 
+  import Datetime._
+
   val UTC: Timezone = new Timezone {
     def offset(year: Int, month: Int, day: Int, millis: Int): Int = 0
 
@@ -14,17 +16,27 @@ object Timezone {
     def getDisplayName: String = "Coordinated Universal Time"
   }
 
-  val EST: Timezone = new Timezone {
-    def offset(year: Int, month: Int, day: Int, millis: Int): Int = -5 * 60 * 60 * 1000
+  val ET: Timezone = new Timezone {
+    def offset(year: Int, month: Int, day: Int, millis: Int): Int = -5 * HOUR
 
-    def offset(millis: Long): Int = -5 * 60 * 60 * 1000
+    def offset(millis: Long): Int = -5 * HOUR
 
-    def getID: String = "EST"
+    def getID: String = "ET"
 
-    def getDisplayName: String = "Eastern Standard Time"
+    def getDisplayName: String = "Eastern Time"
   }
 
-  private val tz = mutable.HashMap[String, Timezone]("UTC" -> UTC, "EST" -> EST)
+  val CT: Timezone = new Timezone {
+    def offset(year: Int, month: Int, day: Int, millis: Int): Int = -6 * HOUR
+
+    def offset(millis: Long): Int = -6 * HOUR
+
+    def getID: String = "CT"
+
+    def getDisplayName: String = "Central Time"
+  }
+
+  private val tz = mutable.HashMap[String, Timezone]("UTC" -> UTC, "EST" -> ET, "CST" -> CT)
 
   def forID(id: String): Option[Timezone] = tz get id
 

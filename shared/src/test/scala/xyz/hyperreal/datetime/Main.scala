@@ -43,8 +43,8 @@ object Main extends App {
         sys.exit(1)
       }
 
-      if (d1.withoutTime != d2) {
-        println("fromDays", d1.withoutTime, d2, ms)
+      if (d1.startOfDay != d2) {
+        println("fromDays", d1.startOfDay, d2, ms)
         sys.exit(1)
       }
 
