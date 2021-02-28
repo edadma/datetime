@@ -6,9 +6,7 @@ import math._
 
 object Main extends App {
 
-  println(Datetime.now(Timezone.EST))
-
-//  javaTimeTest()
+  javaTimeTest()
 
   def javaTimeTest(): Unit = {
     val UTC = ZoneId.of("UTC")
@@ -47,6 +45,11 @@ object Main extends App {
 
       if (d1.withoutTime != d2) {
         println("fromDays", d1.withoutTime, d2, ms)
+        sys.exit(1)
+      }
+
+      if (d1.millis != ms) {
+        println("millis", d1.millis, ms)
         sys.exit(1)
       }
 

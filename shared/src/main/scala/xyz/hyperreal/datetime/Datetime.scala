@@ -1,11 +1,18 @@
 package xyz.hyperreal.datetime
 
 import math._
+
 import scala.collection.immutable.ArraySeq
 
 object Datetime {
 
   def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(platform.currentTimeMillis, tz)
+
+  def today(tz: Timezone = Timezone.UTC): Datetime = {
+    val ms = platform.currentTimeMillis
+
+    fromDays(((ms + tz.offset(ms)) / 24 / 60 / 60 / 1000).toInt)
+  }
 
   private def civilFromDays(days: Int): (Int, Int, Int) = {
     val z = days + 719468
@@ -135,11 +142,16 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int, minutes: Int, s
     era * 146097 + doe - 719468
   }
 
+  lazy val millis: Long =
+    days.toLong * 24 * 60 * 60 * 1000 + hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000 + nanos / 1000000
+
   lazy val dayOfWeek: Int = {
     val z = days
 
     if (z >= -4) (z + 4) % 7 else (z + 5) % 7 + 6
   }
+
+  def sameDateAs(that: Datetime): Boolean = year == that.year && month == that.month && day == that.day
 
   def toISOString: String = DatetimeFormat.ISO.format(this)
 

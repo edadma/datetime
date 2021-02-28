@@ -1,6 +1,6 @@
 package xyz.hyperreal.datetime
 
-object Platform {
+object platform {
 
   def currentTimeMillis: Long = System.currentTimeMillis
 
