@@ -10,7 +10,7 @@ import scala.collection.immutable.ArraySeq
 object DatetimeFormat {
 
   val ISO: DatetimeFormat = DatetimeFormat("YYYY-MM-DDThh:mm:ss.fffZ")
-  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat("WWWW, MMMM D, YYYY |at| h12:mm a")
+  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat("WWWW, MMMM D, Y |at| h12:mm a")
 
   private abstract class Element
   private case class StringElement(s: String) extends Element

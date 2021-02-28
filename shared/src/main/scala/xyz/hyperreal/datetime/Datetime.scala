@@ -10,13 +10,13 @@ object Datetime {
   private[datetime] val HOUR = 60 * MINUTE
   private[datetime] val DAY: Long = 24 * HOUR
 
-  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(platform.currentTimeMillis, tz)
+  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(currentTime, tz)
 
-  def today(tz: Timezone = Timezone.UTC): Datetime = {
-    val ms = platform.currentTimeMillis
+  def today(tz: Timezone = Timezone.UTC): Datetime = fromDays((currentAdjust(tz) / DAY).toInt)
 
-    fromDays(((ms + tz.offset(ms)) / DAY).toInt)
-  }
+  private def currentAdjust(tz: Timezone) = adjust(currentTime, tz)
+
+  private def adjust(ms: Long, tz: Timezone) = ms + tz.offset(ms)
 
   private def civilFromDays(days: Int): (Int, Int, Int) = {
     val z = days + 719468
@@ -39,7 +39,7 @@ object Datetime {
   }
 
   def fromMillis(millis: Long, tz: Timezone = Timezone.UTC): Datetime = {
-    val t = millis + tz.offset(millis)
+    val t = adjust(millis, tz)
     val (y, m, d) = civilFromDays(floorDiv(t, DAY).toInt)
     val day = floorMod(t, DAY).toInt
     val hour = day % HOUR
@@ -48,7 +48,7 @@ object Datetime {
     Datetime(y, m, d, day / HOUR, hour / MINUTE, minute / 1000, day % 1000 * 1000000)
   }
 
-  def from(s: String): Datetime = {
+  def fromString(s: String): Datetime = {
     var idx = 0
 
     def error = sys.error(s"error parsing date-time at character ${idx + 1}")
@@ -150,8 +150,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
     era * 146097 + doe - 719468
   }
 
-  lazy val millis: Long =
-    days.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000 + nanos / 1000000
+  lazy val millis: Long = days.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000 + nanos / 1000000
 
   lazy val dayOfWeek: Int = {
     val z = days
@@ -166,6 +165,12 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
   def minusDays(days: Int): Datetime = fromMillis(millis - days * DAY)
 
   def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(millis - from.offset(millis), to)
+
+  def format(s: String): String = DatetimeFormat(s).format(this)
+
+  def isFuture(tz: Timezone = Timezone.UTC): Boolean = millis > currentAdjust(tz)
+
+  def isPast(tz: Timezone = Timezone.UTC): Boolean = millis < currentAdjust(tz)
 
   def toISOString: String = DatetimeFormat.ISO.format(this)
 

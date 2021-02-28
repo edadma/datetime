@@ -10,7 +10,7 @@ object Timezone {
   val ET: Timezone = new SimpleTimezone(-5 * HOUR, "ET", "Eastern Time")
   val CT: Timezone = new SimpleTimezone(-6 * HOUR, "CT", "Central Time")
 
-  private val tz = mutable.HashMap[String, Timezone]("UTC" -> UTC, "EST" -> ET, "CST" -> CT)
+  private val tz = mutable.HashMap[String, Timezone]("UTC" -> UTC, "ET" -> ET, "CT" -> CT)
 
   def forID(id: String): Option[Timezone] = tz get id
 
