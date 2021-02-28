@@ -7,10 +7,10 @@ import xyz.hyperreal.datetime
 import scala.annotation.tailrec
 import scala.collection.immutable.ArraySeq
 
-object DatetimeFormat {
+object DatetimeFormatter {
 
-  val ISO: DatetimeFormat = DatetimeFormat("YYYY-MM-DDThh:mm:ss.fffZ")
-  val DISPLAY_DATE: DatetimeFormat = DatetimeFormat("WWWW, MMMM D, Y |at| h12:mm a")
+  val ISO: DatetimeFormatter = DatetimeFormatter("YYYY-MM-DDThh:mm:ss.fffZ")
+  val DISPLAY_DATE: DatetimeFormatter = DatetimeFormatter("WWWW, MMMM D, Y |at| h12:mm a")
 
   private abstract class Element
   private case class StringElement(s: String) extends Element
@@ -42,7 +42,7 @@ object DatetimeFormat {
   private val weekdayShort = ArraySeq("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
   private val weekdayLong = ArraySeq("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
 
-  def apply(s: String): DatetimeFormat = {
+  def apply(s: String): DatetimeFormatter = {
     val buf = new ListBuffer[Element]
     val r = CharReader.fromString(s)
 
@@ -128,14 +128,14 @@ object DatetimeFormat {
       }
 
     element(r)
-    new datetime.DatetimeFormat(buf.toList)
+    new datetime.DatetimeFormatter(buf.toList)
   }
 
 }
 
-class DatetimeFormat private (elems: List[DatetimeFormat.Element]) {
+class DatetimeFormatter private (elems: List[DatetimeFormatter.Element]) {
 
-  import DatetimeFormat._
+  import DatetimeFormatter._
 
   private def variants(variant: Int, value: Int): String =
     variant match {

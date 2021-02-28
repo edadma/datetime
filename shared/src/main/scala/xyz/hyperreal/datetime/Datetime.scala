@@ -105,6 +105,13 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   import Datetime._
 
+  private var iso = false
+
+  def timestamp: Datetime = {
+    iso = true
+    this
+  }
+
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
   check("year", year, -10000, 10000)
@@ -166,14 +173,16 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(millis - from.offset(millis), to)
 
-  def format(s: String): String = DatetimeFormat(s).format(this)
+  def format(s: String): String = DatetimeFormatter(s).format(this)
 
   def isFuture(tz: Timezone = Timezone.UTC): Boolean = millis > currentAdjust(tz)
 
   def isPast(tz: Timezone = Timezone.UTC): Boolean = millis < currentAdjust(tz)
 
-  def toISOString: String = DatetimeFormat.ISO.format(this)
+  def toISOString: String = DatetimeFormatter.ISO.format(this)
 
-  def toDisplayString: String = DatetimeFormat.DISPLAY_DATE.format(this)
+  def toDisplayString: String = DatetimeFormatter.DISPLAY_DATE.format(this)
+
+  override def toString: String = if (iso) toISOString else super.toString
 
 }
