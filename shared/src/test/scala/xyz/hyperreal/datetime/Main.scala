@@ -22,9 +22,11 @@ object Main extends App {
       val utc = Instant.ofEpochMilli(ms).atZone(UTC)
       val jdays = utc.getLong(EPOCH_DAY)
       val jdow = utc.getDayOfWeek.getValue % 7
-      val jleap = utc.toLocalDate.isLeapYear
-      val jlom = utc.toLocalDate.lengthOfMonth
-      val jloy = utc.toLocalDate.lengthOfYear
+      val localDate = utc.toLocalDate
+      val jleap = localDate.isLeapYear
+      val jlom = localDate.lengthOfMonth
+      val jloy = localDate.lengthOfYear
+      val doy = localDate.getDayOfYear
       val d1 =
         Datetime(
           utc.getYear,
@@ -48,8 +50,13 @@ object Main extends App {
         sys.exit(1)
       }
 
-      if (d1.millis != ms) {
-        println("millis", d1.millis, ms)
+      if (d1.dayOfYear != doy) {
+        println("dayOfYear", d1, d1.dayOfYear, doy)
+        sys.exit(1)
+      }
+
+      if (d1.epochMillis != ms) {
+        println("millis", d1.epochMillis, ms)
         sys.exit(1)
       }
 
@@ -68,8 +75,8 @@ object Main extends App {
         sys.exit(1)
       }
 
-      if (d1.days != jdays) {
-        println("days from civil", d1, utc, d1.days, jdays)
+      if (d1.epochDays != jdays) {
+        println("days from civil", d1, utc, d1.epochDays, jdays)
         sys.exit(1)
       }
 

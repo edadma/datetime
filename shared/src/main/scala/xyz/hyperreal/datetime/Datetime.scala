@@ -143,11 +143,17 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def startOfDay: Datetime = Datetime(year, month, day)
 
+  def endOfDay: Datetime = Datetime(year, month, day, 23, 59, 59, 999999999)
+
   def startOfMonth: Datetime = Datetime(year, month, 1)
 
-  lazy val lengthOfYear: Int = if (isLeapYear) 366 else 365
+  def endOfMonth: Datetime = Datetime(year, month, lengthOfMonth, 23, 59, 59, 999999999)
 
-  lazy val days: Int = {
+  def lengthOfYear: Int = if (isLeapYear) 366 else 365
+
+  def dayOfYear: Int = epochDays - Datetime(year, 1, 1).epochDays + 1
+
+  lazy val epochDays: Int = {
     val y = if (month <= 2) year - 1 else year
     val era = (if (y >= 0) y else y - 399) / 400
     val yoe = y - era * 400
@@ -157,32 +163,36 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
     era * 146097 + doe - 719468
   }
 
-  lazy val millis: Long = days.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000 + nanos / 1000000
+  def epochSeconds: Long = epochDays.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000
 
-  lazy val dayOfWeek: Int = {
-    val z = days
+  lazy val epochMillis: Long = epochSeconds + nanos / 1000000
+
+  def epochNanos: Long = epochSeconds + nanos
+
+  def dayOfWeek: Int = {
+    val z = epochDays
 
     if (z >= -4) (z + 4) % 7 else (z + 5) % 7 + 6
   }
 
   def sameDateAs(that: Datetime): Boolean = year == that.year && month == that.month && day == that.day
 
-  def plusDays(days: Int): Datetime = fromMillis(millis + days * DAY)
+  def plusDays(days: Int): Datetime = fromMillis(epochMillis + days * DAY)
 
-  def minusDays(days: Int): Datetime = fromMillis(millis - days * DAY)
+  def minusDays(days: Int): Datetime = fromMillis(epochMillis - days * DAY)
 
-  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(millis - from.offset(millis), to)
+  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset(epochMillis), to)
 
   def format(s: String): String = DatetimeFormatter(s).format(this)
 
-  def isFuture(tz: Timezone = Timezone.UTC): Boolean = millis > currentAdjust(tz)
+  def isFuture(tz: Timezone = Timezone.UTC): Boolean = epochMillis > currentAdjust(tz)
 
-  def isPast(tz: Timezone = Timezone.UTC): Boolean = millis < currentAdjust(tz)
+  def isPast(tz: Timezone = Timezone.UTC): Boolean = epochMillis < currentAdjust(tz)
 
   def toISOString: String = DatetimeFormatter.ISO.format(this)
 
   def toDisplayString: String = DatetimeFormatter.DISPLAY_DATE.format(this)
 
-  override def toString: String = if (iso) toISOString else super.toString
+  override def toString: String = if (iso) toISOString else productPrefix + productIterator.mkString("(", ",", ")")
 
 }

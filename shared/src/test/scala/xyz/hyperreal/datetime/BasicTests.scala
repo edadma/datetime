@@ -17,7 +17,7 @@ class BasicTests extends AnyFreeSpec with Matchers {
   }
 
   "millis" in {
-    Datetime(2021, 2, 28, 14, 31, 13, 991000000).millis shouldBe time
+    Datetime(2021, 2, 28, 14, 31, 13, 991000000).epochMillis shouldBe time
   }
 
   "dayOfWeek" in {
