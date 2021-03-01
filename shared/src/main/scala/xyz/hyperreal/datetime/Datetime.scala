@@ -10,6 +10,9 @@ object Datetime {
   private[datetime] val HOUR = 60 * MINUTE
   private[datetime] val DAY: Long = 24 * HOUR
 
+  private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  private val monthlyDays = ArraySeq(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
+
   def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(currentTime, tz)
 
   def today(tz: Timezone = Timezone.UTC): Datetime = fromDays((currentAdjust(tz) / DAY).toInt)
@@ -112,8 +115,6 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
     this
   }
 
-  private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-
   check("year", year, -10000, 10000)
 
   val isLeapYear: Boolean = floorMod(year, 4) == 0 && floorMod(year, 100) > 0 || floorMod(year, 400) == 0
@@ -151,7 +152,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def lengthOfYear: Int = if (isLeapYear) 366 else 365
 
-  def dayOfYear: Int = epochDays - Datetime(year, 1, 1).epochDays + 1
+  def dayOfYear: Int = monthlyDays(month - 1) + day + (if (isLeapYear && month > 2) 1 else 0)
 
   lazy val epochDays: Int = {
     val y = if (month <= 2) year - 1 else year
