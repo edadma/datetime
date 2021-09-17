@@ -1,4 +1,4 @@
-package xyz.hyperreal.datetime
+package io.github.edadma.datetime
 
 import org.scalatest._
 import org.scalatest.freespec.AnyFreeSpec

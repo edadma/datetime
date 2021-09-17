@@ -1,4 +1,4 @@
-package xyz.hyperreal.datetime
+package io.github.edadma.datetime
 
 import math._
 
@@ -13,11 +13,11 @@ object Datetime {
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   private val monthlyDays = ArraySeq(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
 
-  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(currentTime, tz)
+  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(System.currentTimeMillis, tz)
 
   def today(tz: Timezone = Timezone.UTC): Datetime = fromDays((currentAdjust(tz) / DAY).toInt)
 
-  private def currentAdjust(tz: Timezone) = adjust(currentTime, tz)
+  private def currentAdjust(tz: Timezone) = adjust(System.currentTimeMillis, tz)
 
   private def adjust(ms: Long, tz: Timezone) = ms + tz.offset(ms)
 

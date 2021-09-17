@@ -1,8 +1,8 @@
-package xyz.hyperreal.datetime
+package io.github.edadma.datetime
 
 import scala.collection.mutable.ListBuffer
-import xyz.hyperreal.char_reader._
-import xyz.hyperreal.datetime
+import io.github.edadma.char_reader._
+import io.github.edadma.datetime
 
 import scala.annotation.tailrec
 import scala.collection.immutable.ArraySeq

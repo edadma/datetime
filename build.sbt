@@ -23,9 +23,9 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(fil
 //    ),
     githubOwner := "edadma",
     githubRepository := "datetime",
-    mainClass := Some("xyz.hyperreal.datetime.Main"),
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.5" % "test",
-    libraryDependencies += "xyz.hyperreal" %%% "char-reader" % "0.1.0",
+    mainClass := Some("Main"),
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
+    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.3",
     publishMavenStyle := true,
     Test / publishArtifact := false,
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC")

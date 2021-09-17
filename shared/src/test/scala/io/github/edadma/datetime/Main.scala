@@ -1,4 +1,4 @@
-package xyz.hyperreal.datetime
+package io.github.edadma.datetime
 
 import java.time.temporal.ChronoField._
 import java.time.{Instant, ZoneId, ZonedDateTime}

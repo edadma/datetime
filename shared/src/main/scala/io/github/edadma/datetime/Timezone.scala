@@ -1,4 +1,4 @@
-package xyz.hyperreal.datetime
+package io.github.edadma.datetime
 
 import scala.collection.mutable
 
