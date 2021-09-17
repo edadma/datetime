@@ -3,7 +3,7 @@ ThisBuild / versionScheme := Some("semver-spec")
 lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file(".")).
   settings(
     name := "datetime",
-    version := "0.1.2",
+    version := "0.1.4",
     scalaVersion := "2.13.6",
     scalacOptions ++=
       Seq(
