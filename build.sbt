@@ -3,7 +3,7 @@ ThisBuild / versionScheme := Some("semver-spec")
 lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file(".")).
   settings(
     name := "datetime",
-    version := "0.1.4",
+    version := "0.1.5",
     scalaVersion := "2.13.6",
     scalacOptions ++=
       Seq(
@@ -11,7 +11,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(fil
         "-language:postfixOps", "-language:implicitConversions", "-language:existentials", "-language:dynamics",
         "-Xasync"
       ),
-    organization := "xyz.hyperreal",
+    organization := "io.github.edadma",
 //    publishTo := Some(
 //      "Artifactory Realm" at "https://hyperreal.jfrog.io/artifactory/default-maven-virtual"
 //    ),
