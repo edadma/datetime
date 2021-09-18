@@ -20,7 +20,7 @@ object Datetime {
 
   private def currentAdjust(tz: Timezone) = adjust(System.currentTimeMillis, tz)
 
-  private def adjust(ms: Long, tz: Timezone) = ms + tz.offset(ms)
+  private def adjust(ms: Long, tz: Timezone) = ms + tz.offset
 
   private def civilFromDays(days: Int): (Int, Int, Int) = {
     val z = days + 719468
@@ -223,7 +223,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def minusSeconds(seconds: Int): Datetime = fromMillis(epochMillis - seconds * MINUTE)
 
-  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset(epochMillis), to)
+  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset, to)
 
   def format(s: String): String = DatetimeFormatter(s).format(this)
 
