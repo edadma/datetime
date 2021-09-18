@@ -1,6 +1,5 @@
 package io.github.edadma.datetime
 
-import java.util.SimpleTimeZone
 import math._
 import scala.collection.immutable.ArraySeq
 
