@@ -1,12 +1,13 @@
 package io.github.edadma.datetime
 
+import java.util.SimpleTimeZone
 import math._
-
 import scala.collection.immutable.ArraySeq
 
 object Datetime {
 
-  private[datetime] val MINUTE = 60 * 1000
+  private[datetime] val SECOND = 1000
+  private[datetime] val MINUTE = 60 * SECOND
   private[datetime] val HOUR = 60 * MINUTE
   private[datetime] val DAY: Long = 24 * HOUR
 
@@ -73,30 +74,58 @@ object Datetime {
         error
     }
 
-    def opt(c: Char) =
-      if (idx < s.length && s(idx) == c) {
+    def opt(cs: Char*) =
+      if (idx < s.length && cs.contains(s(idx))) {
         idx += 1
+        true
+      } else false
+
+    def space: Boolean =
+      if (idx < s.length && s(idx).isWhitespace) {
+        idx += 1
+        space
         true
       } else false
 
     val y = digits(4, '-')
     val m = digits(2, '-')
-    val d = digits(2, 'T', ' ')
-    val h = digits(2, ':')
-    val min = digits(2, ':')
-    val sec = digits(2)
-    val n =
-      if (opt('.')) {
-        val start = idx
-        val x = digits(9)
+    val d = digits(2)
 
-        (x * math.pow(10, 9 - idx + start)).toInt
-      } else 0
+    if (opt('t', 'T') || space) {
+      val h = digits(2, ':')
+      val min = digits(2, ':')
+      val sec = digits(2)
+      val n =
+        if (opt('.')) {
+          val start = idx
+          val x = digits(9)
 
-    opt('Z')
+          (x * math.pow(10, 9 - idx + start)).toInt
+        } else 0
 
-    if (idx == s.length)
-      Datetime(y, m, d, h, min, sec, n)
+      space
+
+      if (opt('Z'))
+        if (idx == s.length)
+          Datetime(y, m, d, h, min, sec, n)
+        else
+          error
+      else if (opt('+', '-')) {
+        val sign = if (s(idx - 1) == '+') 1 else -1
+        val hoff = sign * digits(2)
+        val moff =
+          if (opt(':'))
+            sign * digits(2)
+          else 0
+
+        if (idx == s.length)
+          Datetime(y, m, d, h, min, sec, n).changeTimezone(Timezone.UTC, new SimpleTimezone(hoff, moff))
+        else
+          error
+      } else error
+
+    } else if (idx == s.length)
+      Datetime(y, m, d)
     else
       error
   }
@@ -181,6 +210,18 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
   def plusDays(days: Int): Datetime = fromMillis(epochMillis + days * DAY)
 
   def minusDays(days: Int): Datetime = fromMillis(epochMillis - days * DAY)
+
+  def plusHours(hours: Int): Datetime = fromMillis(epochMillis + hours * HOUR)
+
+  def minusHours(hours: Int): Datetime = fromMillis(epochMillis - hours * HOUR)
+
+  def plusMinutes(minutes: Int): Datetime = fromMillis(epochMillis + minutes * MINUTE)
+
+  def minusMinutes(minutes: Int): Datetime = fromMillis(epochMillis - minutes * MINUTE)
+
+  def plusSeconds(seconds: Int): Datetime = fromMillis(epochMillis + seconds * SECOND)
+
+  def minusSeconds(seconds: Int): Datetime = fromMillis(epochMillis - seconds * MINUTE)
 
   def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset(epochMillis), to)
 
