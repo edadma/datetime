@@ -234,6 +234,6 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def toDisplayString: String = DatetimeFormatter.DISPLAY_DATE.format(this)
 
-  override def toString: String = if (iso) toISOString else productPrefix + productIterator.mkString("(", ",", ")")
+  override def toString: String = if (iso) toISOString else productPrefix + productIterator.mkString("(", ", ", ")")
 
 }
