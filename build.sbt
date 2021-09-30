@@ -3,7 +3,7 @@ ThisBuild / versionScheme := Some("semver-spec")
 lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file(".")).
   settings(
     name := "datetime",
-    version := "0.1.9",
+    version := "0.1.10",
     scalaVersion := "2.13.6",
     scalacOptions ++=
       Seq(
@@ -25,7 +25,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(fil
     githubRepository := "datetime",
     mainClass := Some("Main"),
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
-    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.5",
+    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.6",
     publishMavenStyle := true,
     Test / publishArtifact := false,
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
