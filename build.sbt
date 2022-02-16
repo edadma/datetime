@@ -4,7 +4,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "datetime",
-    version := "0.1.12",
+    version := "0.1.13",
     scalaVersion := "2.13.8",
     scalacOptions ++=
       Seq(
@@ -31,7 +31,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     githubRepository := "datetime",
     mainClass := Some("Main"),
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.11" % "test",
-    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.8",
+    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.9",
     publishMavenStyle := true,
     Test / publishArtifact := false,
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
