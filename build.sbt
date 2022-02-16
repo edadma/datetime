@@ -1,14 +1,20 @@
 ThisBuild / versionScheme := Some("semver-spec")
 
-lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file(".")).
-  settings(
+lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+  .in(file("."))
+  .settings(
     name := "datetime",
-    version := "0.1.11",
-    scalaVersion := "2.13.6",
+    version := "0.1.12",
+    scalaVersion := "2.13.8",
     scalacOptions ++=
       Seq(
-        "-deprecation", "-feature", "-unchecked",
-        "-language:postfixOps", "-language:implicitConversions", "-language:existentials", "-language:dynamics",
+        "-deprecation",
+        "-feature",
+        "-unchecked",
+        "-language:postfixOps",
+        "-language:implicitConversions",
+        "-language:existentials",
+        "-language:dynamics",
         "-Xasync"
       ),
     organization := "io.github.edadma",
@@ -24,19 +30,19 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(fil
     githubOwner := "edadma",
     githubRepository := "datetime",
     mainClass := Some("Main"),
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
-    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.7",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.11" % "test",
+    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.8",
     publishMavenStyle := true,
     Test / publishArtifact := false,
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
-  ).
-  jvmSettings(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % "provided",
-  ).
-  nativeSettings(
+  )
+  .jvmSettings(
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
+  )
+  .nativeSettings(
     nativeLinkStubs := true
-  ).
-  jsSettings(
+  )
+  .jsSettings(
     jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
 //    Test / scalaJSUseMainModuleInitializer := true,
 //    Test / scalaJSUseTestModuleInitializer := false,
