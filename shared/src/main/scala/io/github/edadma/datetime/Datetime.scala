@@ -69,8 +69,7 @@ object Datetime {
 
         idx += count
         res
-      } else
-        error
+      } else error
     }
 
     def opt(cs: Char*) =
@@ -138,10 +137,9 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   private var iso = false
 
-  def timestamp: Datetime = {
+  def timestamp: Datetime =
     iso = true
     this
-  }
 
   check("year", year, -10000, 10000)
 
@@ -160,7 +158,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
   private def check(name: String, v: Int, l: Int, h: Int): Unit =
     require(l <= v && v <= h, s"$name is out of range: $v")
 
-  def compare(that: Datetime): Int = {
+  infix def compare(that: Datetime): Int =
     for (i <- 0 until productArity)
       productElement(i).asInstanceOf[Int] - that.productElement(i).asInstanceOf[Int] match {
         case 0    =>
@@ -168,7 +166,6 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
       }
 
     0
-  }
 
   def startOfDay: Datetime = Datetime(year, month, day)
 
@@ -182,7 +179,7 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def dayOfYear: Int = monthlyDays(month - 1) + day + (if (isLeapYear && month > 2) 1 else 0)
 
-  lazy val epochDays: Int = {
+  lazy val epochDays: Int =
     val y = if (month <= 2) year - 1 else year
     val era = (if (y >= 0) y else y - 399) / 400
     val yoe = y - era * 400
@@ -190,7 +187,6 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
     val doe = yoe * 365 + yoe / 4 - yoe / 100 + doy
 
     era * 146097 + doe - 719468
-  }
 
   def epochSeconds: Long = epochDays.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000
 
@@ -198,11 +194,10 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def epochNanos: Long = epochSeconds + nanos
 
-  def dayOfWeek: Int = {
+  def dayOfWeek: Int =
     val z = epochDays
 
     if (z >= -4) (z + 4) % 7 else (z + 5) % 7 + 6
-  }
 
   def sameDateAs(that: Datetime): Boolean = year == that.year && month == that.month && day == that.day
 

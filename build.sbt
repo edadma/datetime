@@ -4,7 +4,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "datetime",
-    version := "0.1.14",
+    version := "0.1.15",
     scalaVersion := "3.1.1",
     scalacOptions ++=
       Seq(
@@ -37,7 +37,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
   )
   .jvmSettings(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided"
   )
   .nativeSettings(
     nativeLinkStubs := true
@@ -48,5 +48,5 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
 //    Test / scalaJSUseTestModuleInitializer := false,
     Test / scalaJSUseMainModuleInitializer := false,
     Test / scalaJSUseTestModuleInitializer := true,
-    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := true
   )
