@@ -159,11 +159,15 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
     require(l <= v && v <= h, s"$name is out of range: $v")
 
   infix def compare(that: Datetime): Int =
-    for (i <- 0 until productArity)
+    var i = 0
+
+    while i < productArity do
       productElement(i).asInstanceOf[Int] - that.productElement(i).asInstanceOf[Int] match {
         case 0    =>
         case diff => return math.signum(diff)
       }
+
+      i += 1
 
     0
 

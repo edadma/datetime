@@ -8,6 +8,8 @@ object Main extends App {
 
   javaTimeTest()
 
+  def prt(a: Any*): Unit = println(a.mkString(", "))
+
   def javaTimeTest(): Unit = {
     val UTC = ZoneId.of("UTC")
     val minms = ZonedDateTime.of(-10000, 1, 1, 0, 0, 0, 0, UTC).toInstant.toEpochMilli
@@ -35,53 +37,53 @@ object Main extends App {
           utc.getHour,
           utc.getMinute,
           utc.getSecond,
-          utc.getNano
+          utc.getNano,
         )
       val d2 = Datetime.fromDays(floorDiv(ms, 24 * 60 * 60 * 1000).toInt)
       val d3 = Datetime.fromMillis(ms)
 
       if (d1 != d3) {
-        println("fromMillis", d1, d3, ms)
+        prt("fromMillis", d1, d3, ms)
         sys.exit(1)
       }
 
       if (d1.startOfDay != d2) {
-        println("fromDays", d1.startOfDay, d2, ms)
+        prt("fromDays", d1.startOfDay, d2, ms)
         sys.exit(1)
       }
 
       if (d1.dayOfYear != doy) {
-        println("dayOfYear", d1, d1.dayOfYear, doy)
+        prt("dayOfYear", d1, d1.dayOfYear, doy)
         sys.exit(1)
       }
 
       if (d1.epochMillis != ms) {
-        println("millis", d1.epochMillis, ms)
+        prt("millis", d1.epochMillis, ms)
         sys.exit(1)
       }
 
       if (d1.lengthOfYear != jloy) {
-        println("length of year", d1, utc, d1.lengthOfYear, jloy)
+        prt("length of year", d1, utc, d1.lengthOfYear, jloy)
         sys.exit(1)
       }
 
       if (d1.lengthOfMonth != jlom) {
-        println("length of month", d1, utc, d1.lengthOfMonth, jlom)
+        prt("length of month", d1, utc, d1.lengthOfMonth, jlom)
         sys.exit(1)
       }
 
       if (d1.isLeapYear != jleap) {
-        println("leap year", d1, utc, d1.isLeapYear, jleap)
+        prt("leap year", d1, utc, d1.isLeapYear, jleap)
         sys.exit(1)
       }
 
       if (d1.epochDays != jdays) {
-        println("days from civil", d1, utc, d1.epochDays, jdays)
+        prt("days from civil", d1, utc, d1.epochDays, jdays)
         sys.exit(1)
       }
 
       if (d1.dayOfWeek != jdow) {
-        println("day of week", d1, utc, d1.dayOfWeek, jdow)
+        prt("day of week", d1, utc, d1.dayOfWeek, jdow)
         sys.exit(1)
       }
     }
