@@ -1,8 +1,8 @@
 package io.github.edadma.datetime
 
-import java.time.temporal.ChronoField._
+import java.time.temporal.ChronoField.*
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import math._
+import scala.math.*
 
 object Main extends App {
 

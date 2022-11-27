@@ -1,9 +1,10 @@
 package io.github.edadma.datetime
 
-import math._
+import math.*
+import scala.annotation.targetName
 import scala.collection.immutable.ArraySeq
 
-object Datetime {
+object Datetime:
 
   private[datetime] val SECOND = 1000
   private[datetime] val MINUTE = 60 * SECOND
@@ -13,7 +14,7 @@ object Datetime {
   private val months = ArraySeq(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   private val monthlyDays = ArraySeq(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
 
-  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(System.currentTimeMillis, tz)
+  def now(tz: Timezone = Timezone.UTC): Datetime = fromMillis(System.currentTimeMillis, tz = tz)
 
   def today(tz: Timezone = Timezone.UTC): Datetime = fromDays((currentAdjust(tz) / DAY).toInt)
 
@@ -51,7 +52,7 @@ object Datetime {
     Datetime(y, m, d, day / HOUR, hour / MINUTE, minute / 1000, day % 1000 * 1000000)
   }
 
-  def fromString(s: String): Datetime = {
+  def fromString(s: String): Datetime =
     var idx = 0
 
     def error = sys.error(s"error parsing date-time at character ${idx + 1}")
@@ -126,12 +127,10 @@ object Datetime {
       Datetime(y, m, d)
     else
       error
-  }
-
-}
+end Datetime
 
 case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: Int = 0, seconds: Int = 0, nanos: Int = 0)
-    extends Ordered[Datetime] {
+    extends Ordered[Datetime]:
 
   import Datetime._
 
@@ -171,13 +170,13 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
     0
 
-  def startOfDay: Datetime = Datetime(year, month, day)
+  def startOfDay: Datetime = copy(hours = 0, minutes = 0, seconds = 0, nanos = 0)
 
-  def endOfDay: Datetime = Datetime(year, month, day, 23, 59, 59, 999999999)
+  def endOfDay: Datetime = copy(hours = 23, minutes = 59, seconds = 59, nanos = 999999999)
 
-  def startOfMonth: Datetime = Datetime(year, month, 1)
+  def startOfMonth: Datetime = copy(day = 1).startOfDay
 
-  def endOfMonth: Datetime = Datetime(year, month, lengthOfMonth, 23, 59, 59, 999999999)
+  def endOfMonth: Datetime = copy(day = lengthOfMonth).endOfDay
 
   def lengthOfYear: Int = if (isLeapYear) 366 else 365
 
@@ -192,11 +191,11 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
     era * 146097 + doe - 719468
 
-  def epochSeconds: Long = epochDays.toLong * DAY + hours * HOUR + minutes * MINUTE + seconds * 1000
+  def epochSeconds: Long = (epochDays.toLong * DAY + hours * HOUR + minutes * MINUTE) / 1000 + seconds
 
-  lazy val epochMillis: Long = epochSeconds + nanos / 1000000
+  lazy val epochMillis: Long = epochSeconds * 1000 + nanos / 1000000
 
-  def epochNanos: Long = epochSeconds + nanos
+  def epochNanos: Long = epochSeconds * 1000 + nanos
 
   def dayOfWeek: Int =
     val z = epochDays
@@ -205,23 +204,27 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
 
   def sameDateAs(that: Datetime): Boolean = year == that.year && month == that.month && day == that.day
 
-  def plusDays(days: Int): Datetime = fromMillis(epochMillis + days * DAY)
+  def +(days: Int): Datetime = plusDays(days)
 
-  def minusDays(days: Int): Datetime = fromMillis(epochMillis - days * DAY)
+  def plusDays(days: Int): Datetime = fromMillis(epochMillis + days * DAY).addns(nanos)
 
-  def plusHours(hours: Int): Datetime = fromMillis(epochMillis + hours * HOUR)
+  def minusDays(days: Int): Datetime = fromMillis(epochMillis - days * DAY).addns(nanos)
 
-  def minusHours(hours: Int): Datetime = fromMillis(epochMillis - hours * HOUR)
+  def plusHours(hours: Int): Datetime = fromMillis(epochMillis + hours * HOUR).addns(nanos)
 
-  def plusMinutes(minutes: Int): Datetime = fromMillis(epochMillis + minutes * MINUTE)
+  def minusHours(hours: Int): Datetime = fromMillis(epochMillis - hours * HOUR).addns(nanos)
 
-  def minusMinutes(minutes: Int): Datetime = fromMillis(epochMillis - minutes * MINUTE)
+  def plusMinutes(minutes: Int): Datetime = fromMillis(epochMillis + minutes * MINUTE).addns(nanos)
 
-  def plusSeconds(seconds: Int): Datetime = fromMillis(epochMillis + seconds * SECOND)
+  def minusMinutes(minutes: Int): Datetime = fromMillis(epochMillis - minutes * MINUTE).addns(nanos)
 
-  def minusSeconds(seconds: Int): Datetime = fromMillis(epochMillis - seconds * MINUTE)
+  def plusSeconds(seconds: Int): Datetime = fromMillis(epochMillis + seconds * SECOND).addns(nanos)
 
-  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset, to)
+  def minusSeconds(seconds: Int): Datetime = fromMillis(epochMillis - seconds * SECOND).addns(nanos)
+
+  private def addns(ns: Int): Datetime = copy(nanos = nanos + ns % 1000000)
+
+  def changeTimezone(from: Timezone, to: Timezone): Datetime = fromMillis(epochMillis - from.offset, to).addns(nanos)
 
   def format(s: String): String = DatetimeFormatter(s).format(this)
 
@@ -234,5 +237,3 @@ case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: In
   def toDisplayString: String = DatetimeFormatter.DISPLAY_DATE.format(this)
 
   override def toString: String = if (iso) toISOString else productPrefix + productIterator.mkString("(", ", ", ")")
-
-}

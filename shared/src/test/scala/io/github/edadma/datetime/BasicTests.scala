@@ -7,6 +7,11 @@ class BasicTests extends AnyFreeSpec with Matchers {
 
   val time = 1614522673991L
 
+  "plusDays" in {
+    Datetime.fromMillis(time).plusDays(1).epochMillis shouldBe (time + 24 * 60 * 60 * 1000)
+    Datetime.fromMillis(time).minusDays(1).epochMillis shouldBe (time - 24 * 60 * 60 * 1000)
+  }
+
   "precedes" in {
     Datetime.fromMillis(time) < Datetime.fromMillis(time).plusDays(1) shouldBe true
     Datetime.fromMillis(time) < Datetime.fromMillis(time) shouldBe false
@@ -18,7 +23,7 @@ class BasicTests extends AnyFreeSpec with Matchers {
   }
 
   "fromMillis" in {
-    Datetime.fromMillis(time, Timezone.ET) shouldBe Datetime(2021, 2, 28, 9, 31, 13, 991000000)
+    Datetime.fromMillis(time, tz = Timezone.ET) shouldBe Datetime(2021, 2, 28, 9, 31, 13, 991000000)
   }
 
   "toISOString" in {
