@@ -3,6 +3,7 @@ package io.github.edadma.datetime
 import math.*
 import scala.annotation.targetName
 import scala.collection.immutable.ArraySeq
+import scala.scalajs.js.annotation._
 
 object Datetime:
 
@@ -129,6 +130,7 @@ object Datetime:
       error
 end Datetime
 
+@JSExportTopLevel("Datetime")
 case class Datetime(year: Int, month: Int, day: Int, hours: Int = 0, minutes: Int = 0, seconds: Int = 0, nanos: Int = 0)
     extends Ordered[Datetime]:
 
