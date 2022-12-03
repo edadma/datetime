@@ -50,5 +50,5 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
 //    Test / scalaJSUseTestModuleInitializer := false,
     Test / scalaJSUseMainModuleInitializer := false,
     Test / scalaJSUseTestModuleInitializer := true,
-    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := false,
   )
