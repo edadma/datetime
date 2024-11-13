@@ -7,8 +7,8 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "datetime",
-    version := "0.1.18",
-    scalaVersion := "3.2.1",
+    version := "0.1.19",
+    scalaVersion := "3.5.2",
     scalacOptions ++=
       Seq(
         "-deprecation",
@@ -32,8 +32,8 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     githubOwner := "edadma",
     githubRepository := "datetime",
     mainClass := Some("Main"),
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.13" % "test",
-    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.11",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.19" % "test",
+    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.15",
     publishMavenStyle := true,
     Test / publishArtifact := false,
     licenses += "ISC" -> url("https://opensource.org/licenses/ISC"),
@@ -42,10 +42,11 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
   )
   .nativeSettings(
-    nativeLinkStubs := true,
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
   )
   .jsSettings(
     jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+    scalaJSLinkerConfig ~= { _.withESFeatures(_.withESVersion(org.scalajs.linker.interface.ESVersion.ES2018)) },
 //    Test / scalaJSUseMainModuleInitializer := true,
 //    Test / scalaJSUseTestModuleInitializer := false,
     Test / scalaJSUseMainModuleInitializer := false,

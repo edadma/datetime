@@ -1,9 +1,8 @@
 package io.github.edadma.datetime
 
 import math.*
-import scala.annotation.targetName
 import scala.collection.immutable.ArraySeq
-import scala.scalajs.js.annotation._
+import scala.scalajs.js.annotation.JSExportTopLevel
 
 object Datetime:
 
