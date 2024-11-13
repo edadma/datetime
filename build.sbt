@@ -1,3 +1,5 @@
+import org.scalajs.jsenv.nodejs.NodeJSEnv
+
 ThisBuild / licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
 ThisBuild / versionScheme := Some("semver-spec")
 
@@ -45,8 +47,7 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
   )
   .jsSettings(
-    jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
-    scalaJSLinkerConfig ~= { _.withESFeatures(_.withESVersion(org.scalajs.linker.interface.ESVersion.ES2018)) },
+    jsEnv := new NodeJSEnv(NodeJSEnv.Config().withExecutable("/home/ed/.nvm/versions/node/v18.20.4/bin/node")),
 //    Test / scalaJSUseMainModuleInitializer := true,
 //    Test / scalaJSUseTestModuleInitializer := false,
     Test / scalaJSUseMainModuleInitializer := false,
