@@ -9,8 +9,8 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "datetime",
-    version := "0.1.19",
-    scalaVersion := "3.5.2",
+    version := "0.1.20",
+    scalaVersion := "3.6.3",
     scalacOptions ++=
       Seq(
         "-deprecation",
