@@ -1,16 +1,47 @@
-import org.scalajs.jsenv.nodejs.NodeJSEnv
+ThisBuild / licenses += "ISC"      -> url("https://opensource.org/licenses/ISC")
+ThisBuild / versionScheme          := Some("semver-spec")
+ThisBuild / evictionErrorLevel     := Level.Warn
+ThisBuild / scalaVersion           := "3.7.2"
+ThisBuild / organization           := "io.github.edadma"
+ThisBuild / organizationName       := "edadma"
+ThisBuild / organizationHomepage   := Some(url("https://github.com/edadma"))
+ThisBuild / version                := "0.0.1"
+ThisBuild / sonatypeCredentialHost := "central.sonatype.com"
 
-ThisBuild / licenses += "ISC" -> url("https://opensource.org/licenses/ISC")
-ThisBuild / versionScheme := Some("semver-spec")
+ThisBuild / publishConfiguration := publishConfiguration.value.withOverwrite(true).withChecksums(Vector.empty)
+ThisBuild / resolvers += Resolver.mavenLocal
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
+ThisBuild / resolvers += Resolver.sonatypeCentralRepo("releases")
 
-publish / skip := true
+ThisBuild / sonatypeProfileName := "io.github.edadma"
+
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/edadma/datetime"),
+    "scm:git@github.com:edadma/datetime.git",
+  ),
+)
+ThisBuild / developers := List(
+  Developer(
+    id = "edadma",
+    name = "Edward A. Maxedon, Sr.",
+    email = "edadma@gmail.com",
+    url = url("https://github.com/edadma"),
+  ),
+)
+
+ThisBuild / homepage := Some(url("https://github.com/edadma/datetime"))
+
+ThisBuild / publishTo := {
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
+}
 
 lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "datetime",
-    version := "0.1.20",
-    scalaVersion := "3.6.3",
     scalacOptions ++=
       Seq(
         "-deprecation",
@@ -21,24 +52,12 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
         "-language:existentials",
         "-language:dynamics",
       ),
-    organization := "io.github.edadma",
-//    publishTo := Some(
-//      "Artifactory Realm" at "https://hyperreal.jfrog.io/artifactory/default-maven-virtual"
-//    ),
-//      credentials += Credentials(
-//      "Artifactory Realm",
-//      "hyperreal.jfrog.io",
-//      "edadma@gmail.com",
-//      "fW6N-hDhW*XPXhMt"
-//    ),
-    githubOwner := "edadma",
-    githubRepository := "datetime",
-    mainClass := Some("Main"),
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.19" % "test",
-    libraryDependencies += "io.github.edadma" %%% "char-reader" % "0.1.15",
-    publishMavenStyle := true,
+    libraryDependencies ++= Seq(
+      "io.github.edadma" %%% "char_reader" % "0.1.23",
+    ),
+    publishMavenStyle      := true,
     Test / publishArtifact := false,
-    licenses += "ISC" -> url("https://opensource.org/licenses/ISC"),
   )
   .jvmSettings(
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
@@ -47,10 +66,22 @@ lazy val datetime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.1.0" % "provided",
   )
   .jsSettings(
-    jsEnv := new NodeJSEnv(NodeJSEnv.Config().withExecutable("/home/ed/.nvm/versions/node/v18.20.4/bin/node")),
-//    Test / scalaJSUseMainModuleInitializer := true,
-//    Test / scalaJSUseTestModuleInitializer := false,
+    jsEnv := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+//    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) },
+    //  scalaJSLinkerConfig ~= { _.withModuleSplitStyle(ModuleSplitStyle.SmallestModules) },
+    scalaJSLinkerConfig ~= { _.withSourceMap(false) },
+    //    Test / scalaJSUseMainModuleInitializer := true,
+    //    Test / scalaJSUseTestModuleInitializer := false,
     Test / scalaJSUseMainModuleInitializer := false,
     Test / scalaJSUseTestModuleInitializer := true,
-    scalaJSUseMainModuleInitializer := false,
+    scalaJSUseMainModuleInitializer        := true,
+  )
+
+lazy val root = project
+  .in(file("."))
+  .aggregate(datetime.js, datetime.jvm, datetime.native)
+  .settings(
+    name                := "datetime",
+    publish / skip      := true,
+    publishLocal / skip := true,
   )
